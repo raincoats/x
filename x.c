@@ -39,8 +39,11 @@ int main(int argc, char *argv[])
 					break;
 
 				default:
-					// otherwise print it in the \x12 style
-					printf(format, (0xffffff00 ^ *x));
+					// otherwise print it in the \x12 style. for some reason, 
+					// some characters come out escaped with a bunch of f's in
+					// front of them, like \xffffffa4 \xffffffee. so this just
+					// cuts those f's off.
+					printf(format, (0xffffff00 | *x) ^ 0xffffff00);
 					break;
 			}
 		}

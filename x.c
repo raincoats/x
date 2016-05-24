@@ -14,40 +14,38 @@
 #include <string.h>
 #include <unistd.h>
 
+
+int needs_escaping(int i)
+{
+	
+	if ((i > 0x19 && i < 0x7f)//   ascii printable character range
+		|| (i == 0x09)  // \t
+		|| (i == 0x0a)  // \n      chars outside of the normal ascii 
+		|| (i == 0x0b)  // \v      range that it's okay to print
+	 	|| (i == 0x0d)  // \r
+	 	|| (i == 0x1b)  // \033, \x1b, \e, ansi code
+	 	) {
+		return 0;
+	}
+
+	return 1;
+}
+
 int main(int argc, char *argv[])
 {
 	char x[1];
-	char *format = "\\x%.2x";
 
-	// stdin
 	while(read(0, x, sizeof(x))>0) {
 
-		// ascii printable character range
-		if (*x > 0x19 && *x < 0x7f) {
-			putc(*x, stdout);
+		if (needs_escaping(*x)) {
+			// for some reason, some characters come out escaped with a bunch of
+			// f's in front of them, like \xffffffa4 \xffffffee. so this just 
+			// cuts those f's off.
+			printf("\\%.2x", ((0xffffff00 | *x) ^ 0xffffff00));
 		}
-		else {
-			switch (*x) {
-				// chars outside of the normal ascii range that
-				// it's okay to print
-				case 0x09: // \t
-				case 0x0a: // \n
-				case 0x0b: // \v
-				case 0x0d: // \r
-				case 0x1b: // \033, \x1b, \e, ansi code
-					putc(*x, stdout);
-					break;
-
-				default:
-					// otherwise print it in the \x12 style. for some reason, 
-					// some characters come out escaped with a bunch of f's in
-					// front of them, like \xffffffa4 \xffffffee. so this just
-					// cuts those f's off.
-					printf(format, (0xffffff00 | *x) ^ 0xffffff00);
-					break;
-			}
-		}
+//		printf("\\x%.2x", );
+		else
+			putchar(*x);
 	}
-
 	return 0;
 }

@@ -18,12 +18,13 @@
 
 char x[1];
 
-int ch         = 0;
-int filter_all = 0;
-int allow_tabs = 0;
-int allow_cr   = 0;
-int allow_lf   = 0;
-int allow_ansi = 0;
+int ch          = 0;
+int filter_all  = 0;
+int allow_space = 0;
+int allow_tabs  = 0;
+int allow_cr    = 0;
+int allow_lf    = 0;
+int allow_ansi  = 0;
 
 
 
@@ -35,7 +36,7 @@ int needs_escaping(int i)
 		return 1;
 	}
 
-	if ((i > 0x19) && (i < 0x7f))
+	if ((i > 0x20) && (i < 0x7f))
 		return 0;
 
 	switch (i) {
@@ -43,6 +44,8 @@ int needs_escaping(int i)
 			return allow_cr;
 		case 0x0a:
 			return allow_lf;
+		case 0x20:
+			return allow_space;
 		case 0x09:
 			return allow_tabs;
 		case 0x0b:
@@ -64,7 +67,7 @@ int usage(void)
 int main(int argc, char *argv[])
 {
 	// i basically stole this getopts thing from the Darwin ping source code
-	while ((ch = getopt(argc, argv, "hatnr" )) != -1)
+	while ((ch = getopt(argc, argv, "hatnrs" )) != -1)
 	{
 		switch(ch) {
 
@@ -88,6 +91,10 @@ int main(int argc, char *argv[])
 				allow_cr = 1;
 				break;
 
+			case 's':
+				allow_space = 1;
+				break;
+
 			default:
 				dprintf(2, "%s: %s: %s\n", argv[0], "unknown option", optarg);
 				break;
@@ -101,7 +108,7 @@ int main(int argc, char *argv[])
 			// for some reason, some characters come out escaped with a bunch of
 			// f's in front of them, like \xffffffa4 \xffffffee. so this just 
 			// cuts those f's off.
-			printf("\\%.2x", ((0xffffff00 | *x) ^ 0xffffff00));
+			printf("\\x%.2x", ((0xffffff00 | *x) ^ 0xffffff00));
 		}
 		else {
 			putchar(*x);

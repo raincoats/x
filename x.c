@@ -43,9 +43,9 @@ int main(int argc, char *argv[])
 			// cuts those f's off.
 			printf("\\%.2x", ((0xffffff00 | *x) ^ 0xffffff00));
 		}
-//		printf("\\x%.2x", );
-		else
+		else {
 			putchar(*x);
+		}
 	}
 	return 0;
 }

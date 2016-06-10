@@ -63,10 +63,10 @@ void usage(char *argv0)
 		"escapes only unprintable characters.\n"
 		"works only on stdin, at the moment.\n\n"
 		"  -a   escape all characters\n"
-		"  -t   don’t escape tabs\n"
-		"  -n   don’t escape newlines\n"
-		"  -r   don’t escape carriage returns\n"
-		"  -s   don’t escape spaces\n"
+		"  -t   escape tabs\n"
+		"  -n   escape newlines\n"
+		"  -r   escape carriage returns\n"
+		"  -s   escape spaces\n"
 		"  -h   this lovely help\n"
 	, argv0);
 	exit(2);

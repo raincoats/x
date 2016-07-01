@@ -17,7 +17,7 @@
 
 #define VERSION "0.2"
 
-char x[1];
+unsigned char x[1];
 
 int ch          = 0;
 int filter_all  = 0;
@@ -125,10 +125,7 @@ int main(int argc, char *argv[])
 	while(read(0, x, sizeof(x))>0) {
 
 		if (needs_escaping(*x)) {
-			// for some reason, some characters come out escaped with a bunch of
-			// f's in front of them, like \xffffffa4 \xffffffee. so this just 
-			// cuts those f's off.
-			printf("\\x%.2x", ((0xffffff00 | *x) ^ 0xffffff00));
+			printf("\\x%.2x", (int)*x);
 		}
 		else {
 			putchar(*x);

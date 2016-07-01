@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 
 unsigned int x[1];
 
@@ -30,10 +30,6 @@ int allow_ansi  = 0;
 
 int needs_escaping(int i)
 {
-	if (filter_all) {
-		return 1;
-	}
-
 	if ((i > 0x20) && (i < 0x7f))
 		return 0;
 
@@ -124,7 +120,7 @@ int main(int argc, char *argv[])
 
 	while(read(0, x, 1) > 0) {
 
-		if (needs_escaping(*x)) {
+		if (needs_escaping(*x) || filter_all) {
 			printf("\\x%.2x", *x);
 		}
 		else {

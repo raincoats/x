@@ -17,7 +17,7 @@
 
 #define VERSION "0.2"
 
-unsigned char x[1];
+unsigned int x[1];
 
 int ch          = 0;
 int filter_all  = 0;
@@ -122,10 +122,10 @@ int main(int argc, char *argv[])
 	}
 
 
-	while(read(0, x, sizeof(x))>0) {
+	while(read(0, x, 1) > 0) {
 
 		if (needs_escaping(*x)) {
-			printf("\\x%.2x", (int)*x);
+			printf("\\x%.2x", *x);
 		}
 		else {
 			putchar(*x);

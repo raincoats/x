@@ -21,6 +21,7 @@ However, you can also escape specific types of characters:
 - `-s`, escape spaces
 - `-i`, escape ansi
 
+More examples
 
     $ echo "hello" | x -a
     \x68\x65\x6c\x6c\x6f\x0a

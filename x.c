@@ -14,6 +14,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 #define VERSION "0.3"
 
@@ -78,8 +79,19 @@ void version()
 
 int main(int argc, char *argv[])
 {
-	// i basically stole this getopts thing from the Darwin ping source code
-	while ((ch = getopt(argc, argv, "hvatnrs" )) != -1)
+	static struct option longopts[] = {
+	//  char *name   int has_arg    int *flag  int val
+		{"help",     no_argument,   NULL,      'h'},
+		{"version",  no_argument,   NULL,      'v'},
+		{"all",      no_argument,   NULL,      'a'},
+		{"tabs",     no_argument,   NULL,      't'},
+		{"newlines", no_argument,   NULL,      'n'},
+		{"cr",       no_argument,   NULL,      'r'},
+		{"spaces",   no_argument,   NULL,      's'},
+		{NULL,       0,             NULL,       0 }
+	};
+
+	while ((ch = getopt(argc, argv, "hvatnrs")) != -1)
 	{
 		switch(ch) {
 

@@ -14,6 +14,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 #define VERSION "0.3"
 
@@ -63,6 +64,7 @@ void usage(char *argv0)
 		"  -n   escape newlines\n"
 		"  -r   escape carriage returns\n"
 		"  -s   escape spaces\n"
+		"  -i   escape ansi\n"
 		"  -h   this lovely help\n"
 	, argv0);
 	exit(2);
@@ -78,8 +80,20 @@ void version()
 
 int main(int argc, char *argv[])
 {
-	// i basically stole this getopts thing from the Darwin ping source code
-	while ((ch = getopt(argc, argv, "hvatnrs" )) != -1)
+	static struct option longopts[] = {
+	//  char *name   int has_arg    int *flag  int val
+		{"help",     no_argument,   NULL,      'h'},
+		{"version",  no_argument,   NULL,      'v'},
+		{"all",      no_argument,   NULL,      'a'},
+		{"tabs",     no_argument,   NULL,      't'},
+		{"newlines", no_argument,   NULL,      'n'},
+		{"cr",       no_argument,   NULL,      'r'},
+		{"spaces",   no_argument,   NULL,      's'},
+		{"ansi",     no_argument,   NULL,      'i'},
+		{NULL,       0,             NULL,       0 }
+	};
+
+	while ((ch = getopt(argc, argv, "hvatnrsi")) != -1)
 	{
 		switch(ch) {
 
@@ -109,6 +123,10 @@ int main(int argc, char *argv[])
 
 			case 's':
 				allow_space = 1;
+				break;
+
+			case 'i':
+				allow_ansi = 1;
 				break;
 
 			default:

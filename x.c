@@ -64,6 +64,7 @@ void usage(char *argv0)
 		"  -n   escape newlines\n"
 		"  -r   escape carriage returns\n"
 		"  -s   escape spaces\n"
+		"  -i   escape ansi\n"
 		"  -h   this lovely help\n"
 	, argv0);
 	exit(2);
@@ -88,10 +89,11 @@ int main(int argc, char *argv[])
 		{"newlines", no_argument,   NULL,      'n'},
 		{"cr",       no_argument,   NULL,      'r'},
 		{"spaces",   no_argument,   NULL,      's'},
+		{"ansi",     no_argument,   NULL,      'i'},
 		{NULL,       0,             NULL,       0 }
 	};
 
-	while ((ch = getopt(argc, argv, "hvatnrs")) != -1)
+	while ((ch = getopt(argc, argv, "hvatnrsi")) != -1)
 	{
 		switch(ch) {
 
@@ -121,6 +123,10 @@ int main(int argc, char *argv[])
 
 			case 's':
 				allow_space = 1;
+				break;
+
+			case 'i':
+				allow_ansi = 1;
 				break;
 
 			default:

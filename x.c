@@ -27,7 +27,7 @@ int allow_tabs  = 0;
 int allow_cr    = 0;
 int allow_lf    = 0;
 int allow_ansi  = 0;
-
+int urlencode   = 0;
 
 int needs_escaping(int i)
 {
@@ -80,6 +80,8 @@ void version()
 
 int main(int argc, char *argv[])
 {
+	char *fmt = "\\x%.2x";
+
 	static struct option longopts[] = {
 	//  char *name   int has_arg    int *flag  int val
 		{"help",     no_argument,   NULL,      'h'},
@@ -90,10 +92,11 @@ int main(int argc, char *argv[])
 		{"cr",       no_argument,   NULL,      'r'},
 		{"spaces",   no_argument,   NULL,      's'},
 		{"ansi",     no_argument,   NULL,      'i'},
+		{"urlencode",no_argument,   NULL,      'u'},
 		{NULL,       0,             NULL,       0 }
 	};
 
-	while ((ch = getopt(argc, argv, "hvatnrsi")) != -1)
+	while ((ch = getopt(argc, argv, "hvatnrsiu")) != -1)
 	{
 		switch(ch) {
 
@@ -129,17 +132,21 @@ int main(int argc, char *argv[])
 				allow_ansi = 1;
 				break;
 
+			case 'u':
+				urlencode = 1;
+				fmt = "%%%02X";
+				break;
+
 			default:
 				dprintf(2, "%s: %s: %s\n", argv[0], "unknown option", optarg);
 				break;
 		}
 	}
 
-
 	while(read(0, x, 1) > 0) {
 
 		if (needs_escaping(*x) || filter_all) {
-			printf("\\x%.2x", *x);
+			printf(fmt, *x);
 		}
 		else {
 			putchar(*x);

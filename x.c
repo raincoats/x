@@ -28,9 +28,33 @@ int allow_cr    = 0;
 int allow_lf    = 0;
 int allow_ansi  = 0;
 int urlencode   = 0;
+int php_escape  = 0;
+int sh_escape   = 0;
 
 int needs_escaping(int i)
 {
+	if (php_escape || sh_escape) {
+		switch (i) {
+			case '$':
+			case '`':
+			case '"':
+			case '\\':
+			case '\'':
+			case '{':
+			case '}':
+				return 1;
+		}
+	}
+
+	if (sh_escape) {
+		switch (i) {
+			case '&':
+			case '!':
+			case '*':
+				return 1;
+		}
+	}
+
 	if ((i > 0x20) && (i < 0x7f))
 		return 0;
 
@@ -65,6 +89,9 @@ void usage(char *argv0)
 		"  -r   escape carriage returns\n"
 		"  -s   escape spaces\n"
 		"  -i   escape ansi\n"
+		"  -u   urlencode\n"
+		"  -p   escape for php\n"
+		"  -e   escape for shell\n"
 		"  -h   this lovely help\n"
 	, argv0);
 	exit(2);
@@ -82,61 +109,44 @@ int main(int argc, char *argv[])
 {
 	char *fmt = "\\x%.2x";
 
-	static struct option longopts[] = {
-	//  char *name   int has_arg    int *flag  int val
-		{"help",     no_argument,   NULL,      'h'},
-		{"version",  no_argument,   NULL,      'v'},
-		{"all",      no_argument,   NULL,      'a'},
-		{"tabs",     no_argument,   NULL,      't'},
-		{"newlines", no_argument,   NULL,      'n'},
-		{"cr",       no_argument,   NULL,      'r'},
-		{"spaces",   no_argument,   NULL,      's'},
-		{"ansi",     no_argument,   NULL,      'i'},
-		{"urlencode",no_argument,   NULL,      'u'},
-		{NULL,       0,             NULL,       0 }
-	};
-
-	while ((ch = getopt(argc, argv, "hvatnrsiu")) != -1)
+	while ((ch = getopt(argc, argv, "hvatnrsiupe")) != -1)
 	{
 		switch(ch) {
 
 			case 'h':
 				usage(argv[0]);
 				break;
-
 			case 'v':
 				version();
 				break;
-
 			case 'a':
 				filter_all = 1;
 				break;
-
 			case 't':
 				allow_tabs = 1;
 				break;
-
 			case 'n':
 				allow_lf = 1;
 				break;
-
 			case 'r':
 				allow_cr = 1;
 				break;
-
 			case 's':
 				allow_space = 1;
 				break;
-
 			case 'i':
 				allow_ansi = 1;
 				break;
-
 			case 'u':
 				urlencode = 1;
 				fmt = "%%%02X";
 				break;
-
+			case 'p':
+				php_escape = 1;
+				break;
+			case 'e':
+				sh_escape = 1;
+				break;
 			default:
 				dprintf(2, "%s: %s: %s\n", argv[0], "unknown option", optarg);
 				break;

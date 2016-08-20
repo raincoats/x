@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#define VERSION "0.3"
+#define VERSION "0.7"
 
 unsigned int x[1];
 
@@ -30,28 +30,43 @@ int allow_ansi  = 0;
 int urlencode   = 0;
 int php_escape  = 0;
 int sh_escape   = 0;
+int nonhex      = 0;
+
 
 int needs_escaping(int i)
 {
-	if (php_escape || sh_escape) {
+/*
+ *  things in this function return 2 when they can be
+ *  escaped with a backslash, like \' \" \( etc.
+ *  thinking specifically about shell use/php use.
+ */
+	if (nonhex) {
 		switch (i) {
 			case '$':
 			case '`':
 			case '"':
-			case '\\':
-			case '\'':
 			case '{':
 			case '}':
-				return 1;
-		}
-	}
-
-	if (sh_escape) {
-		switch (i) {
 			case '&':
 			case '!':
 			case '*':
-				return 1;
+			case '=':
+			case ';':
+			case '(':
+			case ')':
+			case '#':
+			case '[':
+			case ']':
+			case '^':
+			case ' ':
+			case '~':
+			case '|':
+			case '?':
+			case '<':
+			case '>':
+			case '\\':
+			case '\'':
+				return 2;
 		}
 	}
 
@@ -76,7 +91,6 @@ int needs_escaping(int i)
 	return 1;
 }
 
-
 void usage(char *argv0)
 {
 	dprintf(2,
@@ -90,8 +104,7 @@ void usage(char *argv0)
 		"  -s   escape spaces\n"
 		"  -i   escape ansi\n"
 		"  -u   urlencode\n"
-		"  -p   escape for php\n"
-		"  -e   escape for shell\n"
+		"  -e   avoid hex where possible\n"
 		"  -h   this lovely help\n"
 	, argv0);
 	exit(2);
@@ -109,7 +122,7 @@ int main(int argc, char *argv[])
 {
 	char *fmt = "\\x%.2x";
 
-	while ((ch = getopt(argc, argv, "hvatnrsiupe")) != -1)
+	while ((ch = getopt(argc, argv, "hvatnrsiue")) != -1)
 	{
 		switch(ch) {
 
@@ -141,11 +154,8 @@ int main(int argc, char *argv[])
 				urlencode = 1;
 				fmt = "%%%02X";
 				break;
-			case 'p':
-				php_escape = 1;
-				break;
 			case 'e':
-				sh_escape = 1;
+				nonhex = 1;
 				break;
 			default:
 				dprintf(2, "%s: %s: %s\n", argv[0], "unknown option", optarg);
@@ -153,10 +163,18 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	while(read(0, x, 1) > 0) {
+	while(read(0, x, 1) > 0)
+	{
+		int esc = needs_escaping(*x);
 
-		if (needs_escaping(*x) || filter_all) {
-			printf(fmt, *x);
+		if (esc || filter_all)
+		{
+			if (nonhex && esc == 2) {
+				printf("\\%s", (unsigned char *)x);
+			}
+			else {
+				printf(fmt, *x);				
+			}
 		}
 		else {
 			putchar(*x);

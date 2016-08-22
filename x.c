@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <unistd.h>
 
 #define VERSION "0.7"
 
@@ -180,5 +181,10 @@ int main(int argc, char *argv[])
 			putchar(*x);
 		}
 	}
+
+	// if the last char was a newline, don't double it
+	if (isatty(1) && (*x != '\n'))
+		putchar('\n');
+
 	return 0;
 }

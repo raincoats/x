@@ -105,6 +105,7 @@ void usage(char *argv0)
 		"  -s   escape spaces\n"
 		"  -i   escape ansi\n"
 		"  -u   urlencode\n"
+		"  -o   octal\n"
 		"  -e   avoid hex where possible\n"
 		"  -h   this lovely help\n"
 	, argv0);
@@ -123,7 +124,7 @@ int main(int argc, char *argv[])
 {
 	char *fmt = "\\x%.2x";
 
-	while ((ch = getopt(argc, argv, "hvatnrsiue")) != -1)
+	while ((ch = getopt(argc, argv, "hvatnrsiuoe")) != -1)
 	{
 		switch(ch) {
 
@@ -155,6 +156,9 @@ int main(int argc, char *argv[])
 				urlencode = 1;
 				fmt = "%%%02X";
 				break;
+			case 'o':
+				fmt = "\\0%02o";
+				break;			
 			case 'e':
 				nonhex = 1;
 				break;

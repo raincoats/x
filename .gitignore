@@ -1,5 +1,7 @@
 /*
 !/x.c
+!/test.sh
+!/testfile
 !/Makefile
 !/.gitignore
 !/LICENSE.md

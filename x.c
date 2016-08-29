@@ -17,7 +17,7 @@
 #include <getopt.h>
 #include <unistd.h>
 
-#define VERSION "0.7"
+#define VERSION "0.8"
 
 unsigned int x[1];
 

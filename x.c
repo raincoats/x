@@ -93,24 +93,30 @@ int needs_escaping(int i)
 		}		
 	}
 
+	/*
+	 *  returning 0 means "escape it"
+	 */
 	if ((i > 0x20) && (i < 0x7f))
 		return 0;
 
 	switch (i) {
 		case '\r':
-			return c_escape? 3 : allow_cr;
+			return allow_cr;
 		case '\n':
-			return c_escape? 3 : allow_lf;
+			return allow_lf;
 		case '\t':
-			return c_escape? 3 : allow_tabs;
+			return allow_tabs;
 		case '\v':
-			return c_escape? 3 : allow_tabs;
+			return allow_tabs;
 		case '\e':
-			return c_escape? 3 : allow_ansi;
+			return allow_ansi;
 		case ' ':
 			return allow_space;
 	}
 
+	/*
+	 *  and finally, returning 1 means it does not need escaping.
+	 */
 	return 1;
 }
 

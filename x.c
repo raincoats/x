@@ -17,7 +17,7 @@
 #include <getopt.h>
 #include <unistd.h>
 
-#define VERSION "0.7"
+#define VERSION "0.8"
 
 unsigned int x[1];
 
@@ -134,6 +134,7 @@ void usage(char *argv0)
 		"  -i   escape ansi\n"
 		"  -u   urlencode\n"
 		"  -o   octal\n"
+		"  -H   html encoding\n"
 		"  -e   avoid hex where possible\n"
 		"  -c   c-style escapes (\\r, \\n, \\v, etc)\n"
 		"  -e   escape shell special characters\n"
@@ -154,7 +155,7 @@ int main(int argc, char *argv[])
 {
 	char *fmt = "\\x%.2x";
 
-	while ((ch = getopt(argc, argv, "hvatnrsiuoce")) != -1)
+	while ((ch = getopt(argc, argv, "hHvatnrsiuoce")) != -1)
 	{
 		switch(ch) {
 
@@ -189,6 +190,9 @@ int main(int argc, char *argv[])
 			case 'o':
 				fmt = "\\%o";
 				break;			
+			case 'H':
+				fmt = "&#x%X;";
+				break;
 			case 'e':
 				nonhex = 1;
 				break;

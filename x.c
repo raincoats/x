@@ -52,8 +52,12 @@ int get_c_escape(int i)
 			return 'v';
 		case '\e':
 			return 'e';
-		case '\0':
-			return '0';
+		case '\a':
+			return 'a';
+		case '\b':
+			return 'b';
+		case '\f':
+			return 'f';
 	}
 	return '?';
 }
@@ -83,14 +87,10 @@ int needs_escaping(int i)
 	 */
 	if (c_escape) {
 		switch (i) {
-			case '\r':
-			case '\n':
-			case '\t':
-			case '\v':
-			case '\e':
-			case '\0':
+			case '\r':  case '\n':  case '\t':  case '\v':
+			case '\e':  case '\a':  case '\b':  case '\f':
 				return 3;
-		}		
+		}
 	}
 
 	/*

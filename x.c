@@ -32,63 +32,91 @@ int urlencode   = 0;
 int php_escape  = 0;
 int sh_escape   = 0;
 int nonhex      = 0;
+int c_escape    = 0;
 
+
+/*
+ *  i'm calling them C escapes because i don't know what they're actually
+ *  called. i'm talking about the escapes like \n instead of \x0a etc.
+ */
+int get_c_escape(int i)
+{
+	switch (i) {
+		case '\r':
+			return 'r';
+		case '\n':
+			return 'n';
+		case '\t':
+			return 't';
+		case '\v':
+			return 'v';
+		case '\e':
+			return 'e';
+		case '\a':
+			return 'a';
+		case '\b':
+			return 'b';
+		case '\f':
+			return 'f';
+	}
+	return '?';
+}
 
 int needs_escaping(int i)
 {
-/*
- *  things in this function return 2 when they can be
- *  escaped with a backslash, like \' \" \( etc.
- *  thinking specifically about shell use/php use.
- */
+	/*
+	 *  things in this function return 2 when they can be
+	 *  escaped with a backslash, like \' \" \( etc.
+	 *  thinking specifically about shell use/php use.
+	 */
 	if (nonhex) {
 		switch (i) {
-			case '$':
-			case '`':
-			case '"':
-			case '{':
-			case '}':
-			case '&':
-			case '!':
-			case '*':
-			case '=':
-			case ';':
-			case '(':
-			case ')':
-			case '#':
-			case '[':
-			case ']':
-			case '^':
-			case ' ':
-			case '~':
-			case '|':
-			case '?':
-			case '<':
-			case '>':
-			case '\\':
-			case '\'':
+			case '$':  case '`':  case '"':  case '{':
+			case '}':  case '&':  case '!':  case '*':
+			case '=':  case ';':  case '(':  case ')':
+			case '#':  case '[':  case ']':  case '^':
+			case ' ':  case '~':  case '|':  case '?':
+			case '<':  case '>':  case '\\': case '\'':
 				return 2;
 		}
 	}
 
+	/*
+	 *  returning 3 means we change \x00 to \0, \x0a to \n, etc.
+	 *  c style escapes.
+	 */
+	if (c_escape) {
+		switch (i) {
+			case '\r':  case '\n':  case '\t':  case '\v':
+			case '\e':  case '\a':  case '\b':  case '\f':
+				return 3;
+		}
+	}
+
+	/*
+	 *  returning 0 means "escape it"
+	 */
 	if ((i > 0x20) && (i < 0x7f))
 		return 0;
 
 	switch (i) {
-		case 0x0d:
+		case '\r':
 			return allow_cr;
-		case 0x0a:
+		case '\n':
 			return allow_lf;
-		case 0x20:
-			return allow_space;
-		case 0x09:
+		case '\t':
 			return allow_tabs;
-		case 0x0b:
+		case '\v':
 			return allow_tabs;
-		case 0x1b:
+		case '\e':
 			return allow_ansi;
+		case ' ':
+			return allow_space;
 	}
 
+	/*
+	 *  and finally, returning 1 means it does not need escaping.
+	 */
 	return 1;
 }
 
@@ -107,6 +135,8 @@ void usage(char *argv0)
 		"  -u   urlencode\n"
 		"  -o   octal\n"
 		"  -e   avoid hex where possible\n"
+		"  -c   c-style escapes (\\r, \\n, \\v, etc)\n"
+		"  -e   escape shell special characters\n"
 		"  -h   this lovely help\n"
 	, argv0);
 	exit(2);
@@ -124,7 +154,7 @@ int main(int argc, char *argv[])
 {
 	char *fmt = "\\x%.2x";
 
-	while ((ch = getopt(argc, argv, "hvatnrsiuoe")) != -1)
+	while ((ch = getopt(argc, argv, "hvatnrsiuoce")) != -1)
 	{
 		switch(ch) {
 
@@ -162,6 +192,9 @@ int main(int argc, char *argv[])
 			case 'e':
 				nonhex = 1;
 				break;
+			case 'c':
+				c_escape = 1;
+				break;
 			default:
 				dprintf(2, "%s: %s: %s\n", argv[0], "unknown option", optarg);
 				break;
@@ -174,7 +207,11 @@ int main(int argc, char *argv[])
 
 		if (esc || filter_all)
 		{
-			if (nonhex && esc == 2) {
+			if (esc == 3) {
+				// get C style escape character, like the n in '\n' for 0x0a
+				*x = get_c_escape(*x);
+			}
+			if (esc == 2 || esc == 3) {
 				printf("\\%s", (unsigned char *)x);
 			}
 			else {

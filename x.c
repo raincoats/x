@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 				fmt = "%%%02X";
 				break;
 			case 'o':
-				fmt = "\\0%02o";
+				fmt = "\\%o";
 				break;			
 			case 'e':
 				nonhex = 1;

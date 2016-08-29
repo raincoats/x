@@ -1,15 +1,18 @@
 all:
-	gcc -Wall -fstack-protector-strong -O2 -march=native x.c -o x
+	gcc -Wall -fstack-protector-strong -O2 -march=native -o x x.c
 
 debug:
-	gcc -fbuiltin -ggdb3 -g3 -O0 -o x x.c
+	gcc -Wall -fbuiltin -ggdb3 -g3 -O0 -o x x.c
 
-install:
-	cp x /usr/local/bin/x
+install: all
+	cp -f x /usr/local/bin/x
+
+debug_install: debug
+	cp -f x /usr/local/bin/x
 
 uninstall:
-	[ -f 'x' ] && rm -f /usr/local/bin/x
+	rm -f /usr/local/bin/x
 
 clean:
-	[ -f 'x' ] && rm -f x
+	rm -f x
 

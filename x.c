@@ -102,7 +102,12 @@ int main(int argc, char *argv[])
 				break;
 			case 'a':
 				esc_all = true;
-				// encoder = &printf;
+				/*
+				 *  holy crap. look at this goddamn cast. i want to print it out
+				 *  and hang it on my wall. and it only took me 3 tries to get
+				 *  right!
+				 */ 
+				encoder = (void(*))&printf;
 				break;
 			case 'u':
 				encoder = &url_encode;

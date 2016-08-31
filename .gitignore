@@ -3,6 +3,8 @@
 !/html.c
 !/generic.c
 !/url.c
+!/x.h
+
 !/test.sh
 !/testfile
 !/Makefile

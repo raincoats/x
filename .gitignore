@@ -1,5 +1,8 @@
 /*
 !/x.c
+!/html.c
+!/generic.c
+!/url.c
 !/test.sh
 !/testfile
 !/Makefile

@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 				 *  and hang it on my wall. and it only took me 3 tries to get
 				 *  right!
 				 */ 
-				encoder = (void(*))&printf;
+				encoder = (void (*))&printf;
 				break;
 			case 'u':
 				encoder = &url_encode;
